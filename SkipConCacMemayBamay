@@ -1,0 +1,53 @@
+getgenv().FindDarkbeard = function()
+    local url = 'https://anbeo.onrender.com/api/status' -- API lấy danh sách server
+    local chooses
+    local foundServers = game:GetService('HttpService'):JSONDecode(game:HttpGet(url))
+
+    for _, v in pairs(foundServers) do 
+        if v.jobId ~= game.JobId then 
+            chooses = v
+        end
+    end
+
+    if chooses then
+        game:GetService("TeleportService"):TeleportToPlaceInstance(7449423635, chooses.jobId, game.Players.LocalPlayer)
+    end
+end
+
+function CheckDarkbeard()
+    for _, boss in pairs(game.Workspace.Enemies:GetChildren()) do
+        if boss.Name == "Darkbeard" and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+            return boss
+        end
+    end
+    for _, boss in pairs(game.ReplicatedStorage:GetChildren()) do
+        if boss.Name == "Darkbeard" then
+            return boss
+        end
+    end
+    return nil
+end
+
+function TeleportToBoss(boss)
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if character and boss then
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = boss.HumanoidRootPart.CFrame + Vector3.new(0, 10, 0) -- Dịch lên trên boss một chút
+        end
+    end
+end
+
+spawn(function()
+    while task.wait(5) do -- Kiểm tra mỗi 5 giây
+        pcall(function()
+            if not CheckDarkbeard() then
+                FindDarkbeard() -- Nếu không thấy boss, hop server
+            else
+                print("🟢 Đã tìm thấy Râu Đen!")
+                TeleportToBoss(CheckDarkbeard()) -- Nếu tìm thấy, teleport đến boss
+            end
+        end)
+    end
+end)
