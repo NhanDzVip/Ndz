@@ -1,0 +1,51 @@
+getgenv().FindLegendarySwordDealer = function()
+    local url = 'https://anbeo.onrender.com/api/status' -- API lấy danh sách server
+    local chooses
+    local foundServers = game:GetService('HttpService'):JSONDecode(game:HttpGet(url))
+
+    for _, v in pairs(foundServers) do 
+        if v.jobId ~= game.JobId then 
+            chooses = v
+        end
+    end
+
+    if chooses then
+        game:GetService("TeleportService"):TeleportToPlaceInstance(7449423635, chooses.jobId, game.Players.LocalPlayer)
+    end
+end
+
+function CheckLegendarySwordDealer()
+    for _, npc in pairs(game.Workspace:GetChildren()) do
+        if npc.Name == "Legendary Sword Dealer" then
+            return npc
+        end
+    end
+    return nil
+end
+
+function TeleportToNPC(npc)
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if character and npc then
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = npc.CFrame + Vector3.new(0, 5, 0) -- Teleport lên trên NPC một chút
+        end
+    end
+end
+
+spawn(function()
+    while task.wait(5) do -- Kiểm tra mỗi 5 giây
+        pcall(function()
+            local npc = CheckLegendarySwordDealer()
+            
+            if npc then
+                print("🟢 Đã tìm thấy Legendary Sword Dealer!")
+                TeleportToNPC(npc) -- Teleport đến NPC ngay khi tìm thấy
+            else
+                print("🔄 Không thấy NPC, tiếp tục hop server...")
+                FindLegendarySwordDealer() -- Nếu không thấy, hop server tiếp
+            end
+        end)
+    end
+end)
