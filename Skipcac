@@ -1,0 +1,56 @@
+getgenv().FindPrehistoricIsland = function()
+    local url = 'https://anbeo.onrender.com/api/status' -- API lấy danh sách server
+    local chooses
+    local foundServers = game:GetService('HttpService'):JSONDecode(game:HttpGet(url))
+
+    for _, v in pairs(foundServers) do 
+        if v.jobId ~= game.JobId then 
+            chooses = v
+        end
+    end
+
+    if chooses then
+        game:GetService("TeleportService"):TeleportToPlaceInstance(7449423635, chooses.jobId, game.Players.LocalPlayer)
+    end
+end
+
+function CheckPrehistoricIsland()
+    for _, island in pairs(game.Workspace:GetChildren()) do
+        if island.Name == "Prehistoric Island" then
+            return island
+        end
+    end
+    return nil
+end
+
+function SlowTeleport(destination)
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if character and destination then
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local startPos = hrp.Position
+            local endPos = destination.Position + Vector3.new(0, 10, 0) -- Dịch lên một chút để tránh kẹt
+            local steps = 50 -- Số bước di chuyển
+            local delayTime = 0.1 -- Thời gian giữa mỗi bước
+            
+            for i = 1, steps do
+                hrp.CFrame = CFrame.new(startPos:Lerp(endPos, i / steps)) -- Di chuyển dần dần
+                task.wait(delayTime)
+            end
+        end
+    end
+end
+
+spawn(function()
+    while task.wait(5) do -- Kiểm tra mỗi 5 giây
+        pcall(function()
+            local island = CheckPrehistoricIsland()
+            if island then
+                SlowTeleport(island) -- Teleport chậm đến đảo
+            else
+                FindPrehistoricIsland() -- Nếu không có đảo, hop server
+            end
+        end)
+    end
+end)
