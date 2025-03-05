@@ -1,0 +1,63 @@
+getgenv().FindMirageIslandAndFullMoon = function()
+    local url = 'https://anbeo.onrender.com/api/status' -- API lấy danh sách server
+    local chooses
+    local foundServers = game:GetService('HttpService'):JSONDecode(game:HttpGet(url))
+
+    for _, v in pairs(foundServers) do 
+        if v.jobId ~= game.JobId then 
+            chooses = v
+        end
+    end
+
+    if chooses then
+        game:GetService("TeleportService"):TeleportToPlaceInstance(7449423635, chooses.jobId, game.Players.LocalPlayer)
+    end
+end
+
+function CheckMirageIsland()
+    for _, island in pairs(game.Workspace:GetChildren()) do
+        if island.Name == "Mirage Island" then
+            return island
+        end
+    end
+    return nil
+end
+
+function CheckFullMoon()
+    local lighting = game:GetService("Lighting")
+    return lighting and lighting.ClockTime >= 18 and lighting.ClockTime <= 6 and lighting:GetAttribute("FullMoon") == true
+end
+
+function SlowTeleport(destination)
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if character and destination then
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local startPos = hrp.Position
+            local endPos = destination.Position + Vector3.new(0, 10, 0) -- Dịch lên trên tránh kẹt
+            local steps = 50 -- Chia thành 50 bước di chuyển
+            local delayTime = 0.1 -- Thời gian giữa mỗi bước
+            
+            for i = 1, steps do
+                hrp.CFrame = CFrame.new(startPos:Lerp(endPos, i / steps)) -- Di chuyển từ từ
+                task.wait(delayTime)
+            end
+        end
+    end
+end
+
+spawn(function()
+    while task.wait(5) do -- Kiểm tra mỗi 5 giây
+        pcall(function()
+            local island = CheckMirageIsland()
+            local isFullMoon = CheckFullMoon()
+            
+            if island and isFullMoon then
+                SlowTeleport(island) -- Nếu có Mirage Island & Full Moon, teleport từ từ đến
+            else
+                FindMirageIslandAndFullMoon() -- Nếu chưa, hop server tiếp tục tìm
+            end
+        end)
+    end
+end)
