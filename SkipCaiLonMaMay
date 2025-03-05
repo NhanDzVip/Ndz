@@ -1,0 +1,67 @@
+-- 🛠 Safe function to load scripts from GitHub
+local function SafeLoad(url)
+    local success, result = pcall(function()
+        return game:HttpGet(url)
+    end)
+
+    if success and result and result ~= "" then
+        return loadstring(result)()
+    else
+        print("❌ Failed to load script from: " .. url)
+        return nil
+    end
+end
+
+-- 🖥️ Load UI from GitHub
+local UiMakeLib = SafeLoad("https://raw.githubusercontent.com/Msunehub/Uilm/refs/heads/main/UiMat1.lua")
+if not UiMakeLib then return end
+
+-- 🔔 Welcome notification
+UiMakeLib:MakeNotify({
+    ["Title"] = "Nhân Dz Hub",
+    ["Description"] = "Version 1 - Auto Hop",
+    ["Color"] = Color3.fromRGB(151, 207, 23),
+    ["Content"] = "Welcome to Nhân Dz Hub",
+    ["Time"] = 1,
+    ["Delay"] = 10
+})
+
+-- 📌 Create main UI window
+local Window = UiMakeLib:MakeGui({
+    ["NameHub"] = "Nhân Dz Hub",
+    ["Description"] = "Auto Hop Server",
+    ["Color"] = Color3.fromRGB(151, 207, 23),
+    ["Logo Player"] = "https://www.roblox.com/headshot-thumbnail/image?userId="..game:GetService("Players").LocalPlayer.UserId .."&width=420&height=420&format=png",
+    ["Name Player"] = tostring(game:GetService("Players").LocalPlayer.Name),
+    ["Tab Width"] = 140
+})
+
+-- 🏆 Create "Auto Hop" tab
+local Tab1 = Window:CreateTab({
+    ["Name"] = "Auto Hop",
+    ["Icon"] = "rbxassetid://121798282953737"
+})
+
+local Section = Tab1:AddSection("Select Auto Hop Type")
+
+-- 🔘 Create Auto Hop buttons
+local scripts = {
+    {Title = "Auto Hop Rip Indra", URL = "https://raw.githubusercontent.com/AnDepZaiHub/AnBeoDepTrai/refs/heads/main/Rip_Indra"},
+    {Title = "Auto Hop Dough King v2", URL = "https://raw.githubusercontent.com/AnDepZaiHub/AnBeoDepTrai/refs/heads/main/Dough_King"},
+    {Title = "Auto Hop Mirage Island + Full Moon", URL = "https://raw.githubusercontent.com/NhanDzVip/Ndz/refs/heads/main/Skiplon"},
+    {Title = "Auto Hop Prehistoric Island [Beta]", URL = "https://raw.githubusercontent.com/NhanDzVip/Ndz/refs/heads/main/Skipcac"},
+    {Title = "Auto Hop Blackbeard", URL = "https://raw.githubusercontent.com/NhanDzVip/Ndz/refs/heads/main/SkipConCacMemayBamay"},
+    {Title = "Auto Hop Triple Katana Legendary", URL = "https://raw.githubusercontent.com/NhanDzVip/Ndz/refs/heads/main/skiplamdog"},
+    {Title = "Auto Hop Haki Legendary", URL = "https://raw.githubusercontent.com/NhanDzVip/Ndz/refs/heads/main/Skipbangniemtin"}
+}
+
+for _, script in ipairs(scripts) do
+    Section:AddButton({
+        ["Title"] = script.Title,
+        ["Content"] = "",
+        ["Icon"] = "rbxassetid://16932740082",
+        ["Callback"] = function()
+            SafeLoad(script.URL)
+        end
+    })
+end
