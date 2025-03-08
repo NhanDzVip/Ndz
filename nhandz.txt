@@ -1,0 +1,155 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/vinh12eqweaws/zingmods/refs/heads/main/zingpro')))()
+
+local Window = OrionLib:MakeWindow({Name = "ZingMod", HidePremium = false, SaveConfig = true, ConfigFolder = "dxl_bf"})
+
+local Tab = Window:MakeTab({
+	Name = "Scripts Mới",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local Tab2 = Window:MakeTab({
+	Name = "Mod Client",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local Tab3 = Window:MakeTab({
+	Name = "Mod Game",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+local Tab4 = Window:MakeTab({
+	Name = "Script Cũ",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+_G.AutoFarm = true -- Auto Farm
+_G.AutoBounty = false -- Auto Bounty
+_G.AutoRaid = false -- Auto Raid
+_G.AutoBoss = false -- Auto Boss
+_G.AutoBuyHaki = false -- Auto mua Haki
+_G.AutoTeleport = false -- Auto teleport
+_G.AutoChest = false -- Auto nhặt rương
+
+local Player = game.Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+
+-- Hàm nhận nhiệm vụ
+local function GetQuest()
+    for _, npc in pairs(workspace.NPCs:GetChildren()) do
+        if npc:IsA("Model") and npc:FindFirstChild("QuestGiver") then
+            fireproximityprompt(npc.QuestGiver.ProximityPrompt)
+            task.wait(1)
+        end
+    end
+end
+
+-- Hàm tìm quái gần nhất
+local function FindNearestEnemy()
+    local ClosestEnemy = nil
+    local ClosestDistance = math.huge
+
+    for _, enemy in pairs(workspace.Enemies:GetChildren()) do
+        if enemy:IsA("Model") and enemy:FindFirstChild("HumanoidRootPart") and enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+            local Distance = (enemy.HumanoidRootPart.Position - HumanoidRootPart.Position).Magnitude
+            if Distance < ClosestDistance then
+                ClosestEnemy = enemy
+                ClosestDistance = Distance
+            end
+        end
+    end
+
+    return ClosestEnemy
+end
+
+-- Hàm tấn công quái
+local function AttackEnemy(enemy)
+    local Tool = Player.Backpack:FindFirstChildOfClass("Tool") or Character:FindFirstChildOfClass("Tool")
+    if Tool then
+        Tool.Parent = Character
+        Tool:Activate()
+    end
+end
+
+-- Auto Farm
+spawn(function()
+    while _G.AutoFarm do
+        task.wait()
+        if not Player.PlayerGui.Main.Quest.Visible then
+            GetQuest()
+            task.wait(1)
+        end
+        local Enemy = FindNearestEnemy()
+        if Enemy then
+            HumanoidRootPart.CFrame = Enemy.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0)
+            AttackEnemy(Enemy)
+        end
+    end
+end)
+
+-- Auto Bounty
+spawn(function()
+    while _G.AutoBounty do
+        task.wait()
+        for _, enemy in pairs(game.Players:GetPlayers()) do
+            if enemy ~= Player and enemy.Character and enemy.Character:FindFirstChild("HumanoidRootPart") then
+                HumanoidRootPart.CFrame = enemy.Character.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0)
+                AttackEnemy(enemy.Character)
+            end
+        end
+    end
+end)
+
+-- Auto Raid
+spawn(function()
+    while _G.AutoRaid do
+        task.wait()
+        -- Code Auto Raid
+    end
+end)
+
+-- Auto Boss
+spawn(function()
+    while _G.AutoBoss do
+        task.wait()
+        for _, boss in pairs(workspace.Bosses:GetChildren()) do
+            if boss:IsA("Model") and boss:FindFirstChild("HumanoidRootPart") and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                HumanoidRootPart.CFrame = boss.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0)
+                AttackEnemy(boss)
+            end
+        end
+    end
+end)
+
+-- Auto Buy Haki
+spawn(function()
+    while _G.AutoBuyHaki do
+        task.wait()
+        for _, shop in pairs(workspace.Shops:GetChildren()) do
+            if shop:IsA("Model") and shop:FindFirstChild("HakiSeller") then
+                fireproximityprompt(shop.HakiSeller.ProximityPrompt)
+            end
+        end
+    end
+end)
+
+-- Auto Teleport
+function TeleportTo(Position)
+    HumanoidRootPart.CFrame = CFrame.new(Position)
+end
+
+-- Auto Chest
+spawn(function()
+    while _G.AutoChest do
+        task.wait()
+        for _, chest in pairs(workspace.Chests:GetChildren()) do
+            if chest:IsA("Model") and chest:FindFirstChild("TouchTrigger") then
+                firetouchinterest(HumanoidRootPart, chest.TouchTrigger, 0)
+            end
+        end
+    end
+end)
+
+print("Nhân Dz Hub - Script đã chạy thành công!")
